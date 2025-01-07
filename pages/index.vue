@@ -14,7 +14,7 @@
     <!-- Darker overlay -->
     <div class="absolute inset-0 bg-black opacity-0"></div>
     <div class="relative z-10 text-white flex flex-col items-center h-[100vh]">
-      <Navbar />
+      <NavBar />
       <div
         class="mt-20 px-0 px-[5%] sm:px-[0] text-center flex flex-col items-center justify-between h-full"
       >

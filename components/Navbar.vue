@@ -17,20 +17,9 @@
         @click="toggleMenu"
         class="md:hidden text-yellow-400 focus:outline-none"
       >
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16m-7 6h7"
-          />
-        </svg>
+        <Menu v-if="!menuOpen" />
+        
+        <X v-else />
       </button>
 
       <!-- Navigation Links -->
@@ -38,13 +27,14 @@
         :class="[
           'md:flex justify-center list-none p-0 m-0 gap-4',
           menuOpen ? 'block md:flex bg-black text-center w-full h-[100vh] flex-col justify-center' : 'hidden md:flex',
-          'absolute md:static top-full md:top-auto left-0 transition-all duration-300',
+          'absolute md:static top-full md:top-auto left-0 mt-6',
         ]"
       >
         <li v-for="(link, index) in links" :key="index">
           <NuxtLink
+          @click="menuOpen = false"
             :to="link.to"
-            class="text-white  mx-2 text-lg md:text-sm text-xl transition-colors duration-300 hover:text-white"
+            class="text-white mx-2 text-lg md:text-sm text-xl hover:text-white"
             active-class="text-white font-bold"
             exact-active-class="text-yellow-400 font-bold"
           >
@@ -57,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { X, Menu } from 'lucide-vue-next';
 
 // State Variables
 const menuOpen = ref(false);

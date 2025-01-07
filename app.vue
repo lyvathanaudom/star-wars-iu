@@ -1,6 +1,6 @@
 <template>
   <div class="bg-black text-white min-h-[100vh]">
-    <Navbar />
+    <NavBar />
     <div :class="pageClasses">
       <NuxtPage />
     </div>

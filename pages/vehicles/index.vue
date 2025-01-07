@@ -46,21 +46,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Truck, UsersRound } from 'lucide-vue-next';
 
 const starWarStore = useStarWarsStore();
-const totalVehicles = ref(0);
 const router = useRouter();
 
-onMounted(async () => {
-  if (starWarStore.vehicles.length === 0) {
-    await starWarStore.fetchVehicles();
-  }
-  try {
-    const response = await fetch("https://swapi.py4e.com/api/vehicles/");
-    const data = await response.json();
-    totalVehicles.value = data.count;
-  } catch (error) {
-    console.error("Failed to fetch total vehicles:", error);
-  }
-});
 
 const handlePageChange = (page: string | number) => {
   let pageUrl: string;
