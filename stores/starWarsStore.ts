@@ -21,7 +21,7 @@ export const useStarWarsStore = defineStore("starWars", {
       this.error = null;
 
       try {
-        const response = await $fetch(url);
+        const response:any = await $fetch(url);
         this.data[resource].list = response.results;
         this.data[resource].next = response.next;
         this.data[resource].previous = response.previous;
@@ -87,7 +87,7 @@ export const useStarWarsStore = defineStore("starWars", {
 
     async fetchName(url: string, fallback: string): Promise<string> {
       try {
-        const response = await $fetch(url);
+        const response: any = await $fetch(url);
         return response.name;
       } catch {
         return fallback;

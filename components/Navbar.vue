@@ -2,7 +2,7 @@
   <header>
 
     <nav
-      class="px-[5%] py-3 flex justify-between items-center fixed z-10 bg-black left-0 right-0"
+      class="px-[5%] py-3 flex justify-between items-center fixed z-50 bg-black left-0 right-0"
     >
       <NuxtLink to="/" class="mx-2">
         <img
@@ -35,7 +35,7 @@
     </nav>
     <ul
       v-if="menuOpen"
-      class="md:hidden gap-4 flex fixed flex-col items-center top-0 pt-8 left-4 bg-black w-full z-9 h-[100vh]"
+      class="md:hidden gap-4 flex fixed flex-col items-center top-0 pt-8 left-4 bg-black w-full z-49 h-[100vh]"
     >
       <li v-for="(link, index) in links" :key="index">
         <NuxtLink
