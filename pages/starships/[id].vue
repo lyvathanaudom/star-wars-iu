@@ -23,12 +23,14 @@
       />
 
       <DetailCard
-       v-if="films.length > 0"
+        v-if="films.length > 0"
         title="Films"
         description="Appearances in Films"
-        :items="films"
+        :items="films.map(film => ({
+          ...film,
+          url: `/films/${getIdFromUrl(film.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
     </div>
     <div v-if="loading" class="flex flex-col space-y-3 mt-20">
@@ -45,11 +47,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useStarWarsStore } from "@/stores/starWarsStore";
+import { Skeleton } from "@/components/ui/skeleton";
+import DetailCard from "@/components/DetailCard";
 
 const route = useRoute();
-const router = useRouter();
 const starshipId = route.params.id;
 
 const starship = ref({});
@@ -57,19 +60,22 @@ const films = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
+const starWarStore = useStarWarsStore();
+
 async function fetchData(url) {
   const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
   return await response.json();
 }
 
 onMounted(async () => {
   try {
-    const starshipData = await fetchData(
-      `https://swapi.py4e.com/api/starships/${starshipId}/`
-    );
+    const starshipData = await fetchData(`https://swapi.py4e.com/api/starships/${starshipId}/`);
     starship.value = starshipData;
 
-    const filmPromises = starshipData.films.map((url) => fetchData(url));
+    const filmPromises = starshipData.films.map(fetchData);
     films.value = await Promise.all(filmPromises);
 
     loading.value = false;
@@ -79,14 +85,7 @@ onMounted(async () => {
   }
 });
 
-function navigateTo(url) {
-  const segments = url.split("/").filter(Boolean);
-  const type = segments.at(-2);
-  const id = segments.at(-1);
-  if (type && id) {
-    router.push(`/${type}/${id}`);
-  } else {
-    console.error("Invalid URL:", url);
-  }
+function getIdFromUrl(url) {
+  return url.split("/").filter(Boolean).pop();
 }
 </script>

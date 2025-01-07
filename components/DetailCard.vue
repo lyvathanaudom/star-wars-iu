@@ -7,13 +7,10 @@
     <CardContent>
       <div v-if="isList">
         <ul class="list-disc">
-          <li
-            v-for="item in items"
-            :key="item.url"
-            @click="navigate(item.url)"
-            class="cursor-pointer hover:underline"
-          >
-            {{ item.name || item.title }}
+          <li v-for="item in items" :key="item.url" class="hover:underline">
+            <NuxtLink :to="item.url" class="cursor-pointer">
+              {{ item.name || item.title }}
+            </NuxtLink>
           </li>
         </ul>
       </div>
@@ -27,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
+import { defineProps } from "vue";
 import {
   Card,
   CardContent,
@@ -35,6 +32,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { NuxtLink } from "#components";
 
 const props = defineProps({
   title: String,
@@ -43,10 +41,4 @@ const props = defineProps({
   details: Object,
   isList: Boolean,
 });
-
-const emit = defineEmits(['navigate']);
-
-function navigate(url) {
-  emit('navigate', url);
-}
 </script>

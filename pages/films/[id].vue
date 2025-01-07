@@ -27,45 +27,55 @@
         v-if="characters.length > 0"
         title="Characters"
         description="Characters in Film"
-        :items="characters"
+        :items="characters.map(character => ({
+          ...character,
+          url: `/characters/${getIdFromUrl(character.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="planets.length > 0"
         title="Planets"
         description="Planets Featured"
-        :items="planets"
+        :items="planets.map(planet => ({
+          ...planet,
+          url: `/planets/${getIdFromUrl(planet.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="starships.length > 0"
         title="Starships"
         description="Starships Featured"
-        :items="starships"
+        :items="starships.map(starship => ({
+          ...starship,
+          url: `/starships/${getIdFromUrl(starship.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="vehicles.length > 0"
         title="Vehicles"
         description="Vehicles Featured"
-        :items="vehicles"
+        :items="vehicles.map(vehicle => ({
+          ...vehicle,
+          url: `/vehicles/${getIdFromUrl(vehicle.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="species.length > 0"
         title="Species"
         description="Species Featured"
-        :items="species"
+        :items="species.map(speciesItem => ({
+          ...speciesItem,
+          url: `/species/${getIdFromUrl(speciesItem.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
     </div>
     <div v-if="loading" class="flex flex-col space-y-3 mt-20">
@@ -81,10 +91,12 @@
 </template>
 
 <script setup lang="ts">
-import { Skeleton } from "@/components/ui/skeleton";
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const route = useRoute();
-const router = useRouter();
 const filmId = route.params.id;
 
 const film = ref({});
@@ -131,24 +143,9 @@ async function loadFilmData() {
   }
 }
 
-loadFilmData();
+onMounted(loadFilmData);
 
-function navigateTo(url) {
-  const segments = url.split("/").filter(Boolean);
-  const type = segments.at(-2);
-  const id = segments.at(-1);
-
-  const routeTypeMap = {
-    people: "characters",
-    // Add other mappings if needed
-  };
-
-  const routeType = routeTypeMap[type] || type;
-
-  if (routeType && id) {
-    router.push(`/${routeType}/${id}`);
-  } else {
-    console.error("Invalid URL:", url);
-  }
+function getIdFromUrl(url) {
+  return url.split("/").filter(Boolean).pop();
 }
 </script>

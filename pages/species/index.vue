@@ -4,8 +4,8 @@
       <h1 class="md:text-4xl text-2xl text-yellow-500 font-bold">Species</h1>
       <PaginationComponent
         :total="totalSpecies"
-        :previousPage="starWarStore.previousPage"
-        :nextPage="starWarStore.nextPage"
+        :previousPage="starWarStore.data.species.previous"
+        :nextPage="starWarStore.data.species.next"
         @page-change="handlePageChange"
       />
     </div>
@@ -15,10 +15,10 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="species in starWarStore.species"
+        v-for="species in starWarStore.data.species.list"
         :key="species.url"
         :title="species.name"
-        @click="navigateToSpecies(species.url)"
+        :link="`/species/${getSpeciesId(species.url)}`"
       >
         <div class="flex gap-1 items-center">
           <UsersRound class="w-3"/>
@@ -37,15 +37,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UsersRound } from 'lucide-vue-next';
+
 const starWarStore = useStarWarsStore();
 const totalSpecies = ref(0);
-const router = useRouter();
 
 onMounted(async () => {
-  if (starWarStore.species.length === 0) {
+  if (starWarStore.data.species.list.length === 0) {
     await starWarStore.fetchSpecies();
   }
   try {
@@ -58,23 +60,11 @@ onMounted(async () => {
 });
 
 const handlePageChange = async (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/species/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/species/?page=${page}`;
-  }
+  const pageUrl = `https://swapi.py4e.com/api/species/?page=${page}`;
   await starWarStore.fetchSpecies(pageUrl);
 };
 
-const navigateToSpecies = (speciesUrl: string) => {
-  const speciesId = speciesUrl.split("/").filter(Boolean).pop();
-  if (speciesId) {
-    router.push(`/species/${speciesId}`);
-  } else {
-    console.error("Invalid species URL:", speciesUrl);
-  }
+const getSpeciesId = (speciesUrl: string) => {
+  return speciesUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

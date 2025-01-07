@@ -15,10 +15,10 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="character in starWarStore.charactersWithSpecies"
+        v-for="character in starWarStore.enrichedCharacters"
         :key="character.url"
         :title="character.name"
-        @click="navigateToCharacter(character.url)"
+        :link="`/characters/${getCharacterId(character.url)}`"
       >
         <div class="flex gap-1 items-center">
           <ContactRound class="w-3" />
@@ -41,26 +41,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStarWarsStore } from "@/stores/starWarsStore";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContactRound, Home } from "lucide-vue-next";
-import {
-  Pagination,
-  PaginationEllipsis,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev,
-} from "@/components/ui/pagination";
-import ItemCard from "@/components/ItemCard.vue"; // Ensure this path is correct
-
 const starWarStore = useStarWarsStore();
 const totalCharacters = ref(0);
 const router = useRouter();
 
 onMounted(async () => {
-  if (starWarStore.characters.length === 0) {
+  if (starWarStore.data.characters.list.length === 0) {
     await starWarStore.fetchCharacters();
   }
   try {
@@ -73,23 +64,11 @@ onMounted(async () => {
 });
 
 const handlePageChange = (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/people/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/people/?page=${page}`;
-  }
+  const pageUrl = `https://swapi.py4e.com/api/people/?page=${page}`;
   starWarStore.fetchCharacters(pageUrl);
 };
 
-const navigateToCharacter = (characterUrl: string) => {
-  const characterId = characterUrl.split("/").filter(Boolean).pop();
-  if (characterId) {
-    router.push(`/characters/${characterId}`);
-  } else {
-    console.error("Invalid character URL:", characterUrl);
-  }
+const getCharacterId = (characterUrl: string) => {
+  return characterUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

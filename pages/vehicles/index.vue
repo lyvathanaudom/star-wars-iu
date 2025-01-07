@@ -4,8 +4,8 @@
       <h1 class="md:text-4xl text-2xl text-yellow-500 font-bold">Vehicles</h1>
       <PaginationComponent
         :total="totalVehicles"
-        :previousPage="starWarStore.previousPage"
-        :nextPage="starWarStore.nextPage"
+        :previousPage="starWarStore.data.vehicles.previous"
+        :nextPage="starWarStore.data.vehicles.next"
         @page-change="handlePageChange"
       />
     </div>
@@ -15,10 +15,10 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="vehicle in starWarStore.vehicles"
+        v-for="vehicle in starWarStore.data.vehicles.list"
         :key="vehicle.url"
         :title="vehicle.name"
-        @click="navigateToVehicle(vehicle.url)"
+        :link="`/vehicles/${getVehicleId(vehicle.url)}`"
       >
         <div class="flex gap-1 items-center">
           <Truck class="w-3" />
@@ -41,32 +41,33 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Truck, UsersRound } from 'lucide-vue-next';
 
 const starWarStore = useStarWarsStore();
-const router = useRouter();
+const totalVehicles = ref(0);
 
-
-const handlePageChange = (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/vehicles/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/vehicles/?page=${page}`;
+onMounted(async () => {
+  if (starWarStore.data.vehicles.list.length === 0) {
+    await starWarStore.fetchVehicles();
   }
-  starWarStore.fetchVehicles(pageUrl);
+  try {
+    const response = await fetch("https://swapi.py4e.com/api/vehicles/");
+    const data = await response.json();
+    totalVehicles.value = data.count;
+  } catch (error) {
+    console.error("Failed to fetch total vehicles:", error);
+  }
+});
+
+const handlePageChange = async (page: string | number) => {
+  const pageUrl = `https://swapi.py4e.com/api/vehicles/?page=${page}`;
+  await starWarStore.fetchVehicles(pageUrl);
 };
 
-const navigateToVehicle = (vehicleUrl: string) => {
-  const vehicleId = vehicleUrl.split("/").filter(Boolean).pop();
-  if (vehicleId) {
-    router.push(`/vehicles/${vehicleId}`);
-  } else {
-    console.error("Invalid vehicle URL:", vehicleUrl);
-  }
+const getVehicleId = (vehicleUrl: string) => {
+  return vehicleUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

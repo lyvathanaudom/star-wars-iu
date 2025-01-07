@@ -19,22 +19,25 @@
       />
 
       <DetailCard
-      v-if="residents.length > 0"
+        v-if="residents.length > 0"
         title="Residents"
         description="Inhabitants of the Planet"
-        :items="residents"
+        :items="residents.map(resident => ({
+          ...resident,
+          url: `/characters/${getIdFromUrl(resident.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
-      v-if="films.length > 0"
-
+        v-if="films.length > 0"
         title="Films"
         description="Appearances in Films"
-        :items="films"
+        :items="films.map(film => ({
+          ...film,
+          url: `/films/${getIdFromUrl(film.url)}`
+        }))"
         :isList="true"
-        @navigate="navigateTo"
       />
     </div>
     <div v-if="loading" class="flex flex-col space-y-3 mt-20">
@@ -50,9 +53,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const route = useRoute();
-const router = useRouter();
 const planetId = route.params.id;
 
 const planet = ref({});
@@ -63,24 +69,21 @@ const error = ref(null);
 
 async function fetchData(url) {
   const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
   return await response.json();
 }
 
 onMounted(async () => {
   try {
-    const planetData = await fetchData(
-      `https://swapi.py4e.com/api/planets/${planetId}/`
-    );
+    const planetData = await fetchData(`https://swapi.py4e.com/api/planets/${planetId}/`);
     planet.value = planetData;
 
-    const residentPromises = planetData.residents.map((url) => fetchData(url));
-    const residentData = await Promise.all(residentPromises);
-    residents.value = residentData.map((resident) => ({
-      name: resident.name,
-      url: resident.url,
-    }));
+    const residentPromises = planetData.residents.map(fetchData);
+    residents.value = await Promise.all(residentPromises);
 
-    const filmPromises = planetData.films.map((url) => fetchData(url));
+    const filmPromises = planetData.films.map(fetchData);
     films.value = await Promise.all(filmPromises);
 
     loading.value = false;
@@ -90,23 +93,7 @@ onMounted(async () => {
   }
 });
 
-function navigateTo(url) {
-  const segments = url.split('/').filter(Boolean);
-  const type = segments.at(-2);
-  const id = segments.at(-1);
-
-  // Map API type to application route type
-  const routeTypeMap = {
-    people: 'characters', // Map 'people' to 'characters'
-    // Add other mappings if needed
-  };
-
-  const routeType = routeTypeMap[type] || type;
-
-  if (routeType && id) {
-    router.push(`/${routeType}/${id}`);
-  } else {
-    console.error('Invalid URL:', url);
-  }
+function getIdFromUrl(url) {
+  return url.split("/").filter(Boolean).pop();
 }
 </script>

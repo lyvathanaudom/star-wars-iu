@@ -4,8 +4,8 @@
       <h1 class="md:text-4xl text-2xl text-yellow-500 font-bold">Films</h1>
       <PaginationComponent
         :total="totalFilms"
-        :previousPage="starWarStore.previousPage"
-        :nextPage="starWarStore.nextPage"
+        :previousPage="starWarStore.data.films.previous"
+        :nextPage="starWarStore.data.films.next"
         @page-change="handlePageChange"
       />
     </div>
@@ -15,13 +15,13 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="film in starWarStore.films"
+        v-for="film in starWarStore.data.films.list"
         :key="film.url"
         :title="film.title"
-        @click="navigateToFilm(film.url)"
+        :link="`/films/${getFilmId(film.url)}`"
       >
         <div class="flex gap-1 items-center">
-          <Calendar class="w-3"/>
+          <Calendar class="w-3" />
           <div class="text-xs">Release Date: {{ film.release_date }}</div>
         </div>
       </ItemCard>
@@ -37,15 +37,18 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar } from 'lucide-vue-next';
+
+
 const starWarStore = useStarWarsStore();
 const totalFilms = ref(0);
-const router = useRouter();
 
 onMounted(async () => {
-  if (starWarStore.films.length === 0) {
+  if (starWarStore.data.films.list.length === 0) {
     await starWarStore.fetchFilms();
   }
   try {
@@ -58,23 +61,11 @@ onMounted(async () => {
 });
 
 const handlePageChange = (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/films/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/films/?page=${page}`;
-  }
+  const pageUrl = `https://swapi.py4e.com/api/films/?page=${page}`;
   starWarStore.fetchFilms(pageUrl);
 };
 
-const navigateToFilm = (filmUrl: string) => {
-  const filmId = filmUrl.split("/").filter(Boolean).pop();
-  if (filmId) {
-    router.push(`/films/${filmId}`);
-  } else {
-    console.error("Invalid film URL:", filmUrl);
-  }
+const getFilmId = (filmUrl: string) => {
+  return filmUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

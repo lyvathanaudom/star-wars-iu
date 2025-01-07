@@ -4,8 +4,8 @@
       <h1 class="md:text-4xl text-2xl text-yellow-500 font-bold">Planets</h1>
       <PaginationComponent
         :total="totalPlanets"
-        :previousPage="starWarStore.previousPage"
-        :nextPage="starWarStore.nextPage"
+        :previousPage="starWarStore.data.planets.previous"
+        :nextPage="starWarStore.data.planets.next"
         @page-change="handlePageChange"
       />
     </div>
@@ -15,10 +15,10 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="planet in starWarStore.planets"
+        v-for="planet in starWarStore.data.planets.list"
         :key="planet.url"
         :title="planet.name"
-        @click="navigateToPlanet(planet.url)"
+        :link="`/planets/${getPlanetId(planet.url)}`"
       >
         <div class="flex gap-1 items-center">
           <Globe class="w-3" />
@@ -41,16 +41,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Globe, UsersRound } from 'lucide-vue-next';
-
 const starWarStore = useStarWarsStore();
 const totalPlanets = ref(0);
 const router = useRouter();
 
 onMounted(async () => {
-  if (starWarStore.planets.length === 0) {
+  if (starWarStore.data.planets.list.length === 0) {
     await starWarStore.fetchPlanets();
   }
   try {
@@ -63,23 +64,11 @@ onMounted(async () => {
 });
 
 const handlePageChange = (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/planets/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/planets/?page=${page}`;
-  }
+  const pageUrl = `https://swapi.py4e.com/api/planets/?page=${page}`;
   starWarStore.fetchPlanets(pageUrl);
 };
 
-const navigateToPlanet = (planetUrl: string) => {
-  const planetId = planetUrl.split("/").filter(Boolean).pop();
-  if (planetId) {
-    router.push(`/planets/${planetId}`);
-  } else {
-    console.error("Invalid planet URL:", planetUrl);
-  }
+const getPlanetId = (planetUrl: string) => {
+  return planetUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

@@ -4,8 +4,8 @@
       <h1 class="md:text-4xl text-2xl text-yellow-500 font-bold">Starships</h1>
       <PaginationComponent
         :total="totalStarships"
-        :previousPage="starWarStore.previousPage"
-        :nextPage="starWarStore.nextPage"
+        :previousPage="starWarStore.data.starships.previous"
+        :nextPage="starWarStore.data.starships.next"
         @page-change="handlePageChange"
       />
     </div>
@@ -15,10 +15,10 @@
       class="grid mt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ItemCard
-        v-for="starship in starWarStore.starships"
+        v-for="starship in starWarStore.data.starships.list"
         :key="starship.url"
         :title="starship.name"
-        @click="navigateToStarship(starship.url)"
+        :link="`/starships/${getStarshipId(starship.url)}`"
       >
         <div class="flex gap-1 items-center">
           <Rocket class="w-3"/>
@@ -37,18 +37,16 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Rocket } from 'lucide-vue-next';
 
-
 const starWarStore = useStarWarsStore();
 const totalStarships = ref(0);
-const router = useRouter();
 
 onMounted(async () => {
-  if (starWarStore.starships.length === 0) {
+  if (starWarStore.data.starships.list.length === 0) {
     await starWarStore.fetchStarships();
   }
   try {
@@ -60,24 +58,12 @@ onMounted(async () => {
   }
 });
 
-const handlePageChange = (page: string | number) => {
-  let pageUrl: string;
-  if (typeof page === "string") {
-    const url = new URL(page);
-    const pageNumber = url.searchParams.get("page") || "1";
-    pageUrl = `https://swapi.py4e.com/api/starships/?page=${pageNumber}`;
-  } else {
-    pageUrl = `https://swapi.py4e.com/api/starships/?page=${page}`;
-  }
-  starWarStore.fetchStarships(pageUrl);
+const handlePageChange = async (page: string | number) => {
+  const pageUrl = `https://swapi.py4e.com/api/starships/?page=${page}`;
+  await starWarStore.fetchStarships(pageUrl);
 };
 
-const navigateToStarship = (starshipUrl: string) => {
-  const starshipId = starshipUrl.split("/").filter(Boolean).pop();
-  if (starshipId) {
-    router.push(`/starships/${starshipId}`);
-  } else {
-    console.error("Invalid starship URL:", starshipUrl);
-  }
+const getStarshipId = (starshipUrl: string) => {
+  return starshipUrl.split("/").filter(Boolean).pop() || '';
 };
 </script>

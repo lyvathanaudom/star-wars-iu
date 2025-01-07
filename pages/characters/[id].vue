@@ -24,27 +24,24 @@
         v-if="films.length > 0"
         title="Films"
         description="Appearances in Films"
-        :items="films"
+        :items="films.map(film => ({ ...film, url: `/films/${getIdFromUrl(film.url)}` }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="vehicles.length > 0"
         title="Vehicles"
         description="Vehicles Used"
-        :items="vehicles"
+        :items="vehicles.map(vehicle => ({ ...vehicle, url: `/vehicles/${getIdFromUrl(vehicle.url)}` }))"
         :isList="true"
-        @navigate="navigateTo"
       />
 
       <DetailCard
         v-if="starships.length > 0"
         title="Starships"
         description="Starships Piloted"
-        :items="starships"
+        :items="starships.map(starship => ({ ...starship, url: `/starships/${getIdFromUrl(starship.url)}` }))"
         :isList="true"
-        @navigate="navigateTo"
       />
     </div>
     <div v-if="loading" class="flex flex-col space-y-3 mt-20">
@@ -60,18 +57,25 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStarWarsStore } from '@/stores/starWarsStore';
+import { Skeleton } from '@/components/ui/skeleton';
+import DetailCard from '@/components/DetailCard';
+
 const route = useRoute();
-const router = useRouter();
 const characterId = route.params.id;
 
 const character = ref({});
 const homeworldName = ref("");
-const speciesName = ref("Unknown"); 
+const speciesName = ref("Unknown");
 const films = ref([]);
 const vehicles = ref([]);
 const starships = ref([]);
 const loading = ref(true);
 const error = ref(null);
+
+const starWarStore = useStarWarsStore();
 
 async function fetchData(url) {
   const response = await fetch(url);
@@ -80,9 +84,7 @@ async function fetchData(url) {
 
 onMounted(async () => {
   try {
-    const characterData = await fetchData(
-      `https://swapi.py4e.com/api/people/${characterId}/`
-    );
+    const characterData = await fetchData(`https://swapi.py4e.com/api/people/${characterId}/`);
     character.value = characterData;
 
     const homeworldData = await fetchData(characterData.homeworld);
@@ -99,9 +101,7 @@ onMounted(async () => {
     const vehiclePromises = characterData.vehicles.map((url) => fetchData(url));
     vehicles.value = await Promise.all(vehiclePromises);
 
-    const starshipPromises = characterData.starships.map((url) =>
-      fetchData(url)
-    );
+    const starshipPromises = characterData.starships.map((url) => fetchData(url));
     starships.value = await Promise.all(starshipPromises);
 
     loading.value = false;
@@ -111,15 +111,7 @@ onMounted(async () => {
   }
 });
 
-function navigateTo(url) {
-  const segments = url.split("/").filter(Boolean);
-  const type = segments.at(-2); 
-  const id = segments.at(-1); 
-  if (type && id) {
-    router.push(`/${type}/${id}`);
-  } else {
-    console.error("Invalid URL:", url);
-  }
+function getIdFromUrl(url) {
+  return url.split("/").filter(Boolean).pop();
 }
-
 </script>
