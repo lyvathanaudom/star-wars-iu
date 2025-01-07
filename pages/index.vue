@@ -20,7 +20,7 @@
       >
         <div>
           <h1
-            class="text-[65px] text-yellow-500 font-semibold mb-4 leading-relaxed tracking-widest"
+            class="md:text-[65px] text-2xl text-yellow-500 font-semibold mb-4 leading-relaxed tracking-widest"
           >
             STAR WARS UNIVERSE
           </h1>
@@ -34,8 +34,7 @@
 
         <NuxtLink
           to="/explore"
-          class="bg-white bg-opacity-5 text-white px-16 py-2 rounded-full transition-colors duration-300 mb-24 border border-white"
-          style="backdrop-filter: blur(4px);"
+          class="bg-white bg-opacity-5 text-white px-12 py-2 rounded-full mb-24 border border-white backdrop-blur hover:backdrop-blur-lg transition"
         >
           Explore
         </NuxtLink>

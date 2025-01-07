@@ -1,16 +1,28 @@
 <template>
   <div class="text-white pb-10">
-    <h1 class="text-4xl font-semibold text-yellow-500 mb-4">Explore</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+    <h1 class="text-4xl font-semibold text-yellow-500 mt-6">Explore</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
       <NuxtLink
         v-for="(item, index) in items"
         :key="index"
         :to="item.to"
         class="relative bg-gray-950 rounded-lg overflow-hidden shadow-lg"
       >
-        <img :src="item.imgSrc" :alt="item.alt" class="w-full h-48 object-cover" />
-        <div class="absolute inset-0 flex items-end p-4 bg-black bg-opacity-30">
-          <h2 class="text-xl font-semibold">{{ item.title }}</h2>
+        <!-- Image -->
+        <img
+          :src="item.imgSrc"
+          :alt="item.alt"
+          class="w-full h-56 object-cover"
+        />
+        
+        <!-- Gradient Overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black via-black-50 to-transparent"
+        ></div>
+
+        <!-- Title -->
+        <div class="absolute inset-0 flex items-end p-4">
+          <h2 class="text-4xl font-semibold">{{ item.title }}</h2>
         </div>
       </NuxtLink>
     </div>

@@ -41,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute, useRouter } from "vue-router";
 import { useStarWarsStore } from "@/stores/starWarsStore";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

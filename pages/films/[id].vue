@@ -81,9 +81,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import DetailCard from "@/components/DetailCard.vue";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const route = useRoute();

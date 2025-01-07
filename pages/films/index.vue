@@ -37,11 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
-import ItemCard from '@/components/ItemCard.vue'; // Ensure this path is correct
 import { Calendar } from 'lucide-vue-next';
 const starWarStore = useStarWarsStore();
 const totalFilms = ref(0);

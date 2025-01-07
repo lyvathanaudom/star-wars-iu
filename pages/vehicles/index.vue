@@ -41,12 +41,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Truck, UsersRound } from 'lucide-vue-next';
-import ItemCard from '@/components/ItemCard.vue'; // Ensure this path is correct
 
 const starWarStore = useStarWarsStore();
 const totalVehicles = ref(0);

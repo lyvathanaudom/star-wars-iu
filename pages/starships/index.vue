@@ -37,12 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Rocket } from 'lucide-vue-next';
-import ItemCard from '@/components/ItemCard.vue';
+
 
 const starWarStore = useStarWarsStore();
 const totalStarships = ref(0);

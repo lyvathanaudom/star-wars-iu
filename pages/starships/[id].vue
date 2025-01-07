@@ -46,7 +46,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import DetailCard from "@/components/DetailCard.vue";
 import { useStarWarsStore } from "@/stores/starWarsStore";
 
 const route = useRoute();

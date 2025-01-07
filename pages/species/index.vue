@@ -37,11 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useStarWarsStore } from '@/stores/starWarsStore';
-import PaginationComponent from '@/components/PaginationComponent.vue';
-import ItemCard from '@/components/ItemCard.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UsersRound } from 'lucide-vue-next';
 const starWarStore = useStarWarsStore();
