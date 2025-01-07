@@ -1,16 +1,23 @@
 import { defineStore } from "pinia";
+import type { Character } from "../interfaces/character";
+import type { Film } from "../interfaces/film";
+import type { Planet } from "../interfaces/planet";
+import type { Species } from "../interfaces/species";
+import type { Starship } from "../interfaces/starship";
+import type { Vehicle } from "../interfaces/vehicle";
+import type { ResourceCollection } from "../interfaces/resource-collection";
 
 export const useStarWarsStore = defineStore("starWars", {
   state: () => ({
     data: {
-      characters: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
-      films: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
-      planets: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
-      species: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
-      starships: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
-      vehicles: { list: [] as Array<any>, next: null as string | null, previous: null as string | null },
+      characters: { list: [] as Character[], next: null, previous: null } as ResourceCollection<Character>,
+      films: { list: [] as Film[], next: null, previous: null } as ResourceCollection<Film>,
+      planets: { list: [] as Planet[], next: null, previous: null } as ResourceCollection<Planet>,
+      species: { list: [] as Species[], next: null, previous: null } as ResourceCollection<Species>,
+      starships: { list: [] as Starship[], next: null, previous: null } as ResourceCollection<Starship>,
+      vehicles: { list: [] as Vehicle[], next: null, previous: null } as ResourceCollection<Vehicle>,
     },
-    enrichedCharacters: [] as Array<any>, // Characters with species and homeworld details
+    enrichedCharacters: [] as Array<Character & { speciesName: string; homeworldName: string }>,
     loading: false,
     error: null as string | null,
   }),
@@ -21,12 +28,13 @@ export const useStarWarsStore = defineStore("starWars", {
       this.error = null;
 
       try {
-        const response:any = await $fetch(url);
+        const response: any = await $fetch(url);
         this.data[resource].list = response.results;
         this.data[resource].next = response.next;
         this.data[resource].previous = response.previous;
       } catch (error) {
         this.error = error instanceof Error ? error.message : String(error);
+        console.error(`Error fetching data for ${resource}:`, this.error);
       } finally {
         this.loading = false;
       }
@@ -89,7 +97,8 @@ export const useStarWarsStore = defineStore("starWars", {
       try {
         const response: any = await $fetch(url);
         return response.name;
-      } catch {
+      } catch (error) {
+        console.error(`Error fetching name from ${url}:`, error);
         return fallback;
       }
     },
