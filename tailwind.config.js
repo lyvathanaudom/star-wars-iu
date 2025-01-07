@@ -1,11 +1,9 @@
-const animate = require("tailwindcss-animate")
-
-/** @type {import('tailwindcss').Config} */
+const animate = require("tailwindcss-animate");
+/* assets/css/tailwind.css or your main CSS file */
 module.exports = {
   darkMode: ["class"],
   safelist: ["dark"],
   prefix: "",
-  
   theme: {
     container: {
       center: true,
@@ -20,7 +18,7 @@ module.exports = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        darkBackground: '#040D12', 
+        darkBackground: '#111',
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -81,7 +79,10 @@ module.exports = {
         "collapsible-down": "collapsible-down 0.2s ease-in-out",
         "collapsible-up": "collapsible-up 0.2s ease-in-out",
       },
+      fontFamily: {
+        custom: ['Montserrat', 'sans-serif'], 
+      },
     },
   },
   plugins: [animate],
-}
+};
